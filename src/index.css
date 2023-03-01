@@ -17,3 +17,11 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.button {
+  background: #304e70 !important;
+}
+
+button:hover {
+  background: #8c2626 !important;
+}

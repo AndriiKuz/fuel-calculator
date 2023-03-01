@@ -10,13 +10,16 @@ function App() {
   const [distance, setDistance] = useState(0);
   const [averageFuelConsumption, setAvegageFuelConsumption] = useState(0);
   const [price, setPrice] = useState(0);
-  const [resutlt, setResult] = useState(0);
+  const [result, setResult] = useState(0);
+  const [quantityPersons, setQuantityPersons] = useState(1);
+  const [pricePerPerson, setPricePerPerson] = useState(0);
 
   const regexp = new RegExp('[^0-9.]');
 
   useEffect(() => {
     setResult((averageFuelConsumption / 100) * distance * price);
-  }, [distance, averageFuelConsumption, price]);
+    setPricePerPerson(result / quantityPersons);
+  }, [distance, averageFuelConsumption, price, quantityPersons, result]);
 
   const onInputHandler = (name, value = 0) => {
     switch (name) {
@@ -29,6 +32,9 @@ function App() {
       case 'price':
         setPrice(value);
         break;
+      case 'quantityPersons':
+        setQuantityPersons(value);
+        break;
       default:
     }
   };
@@ -37,6 +43,7 @@ function App() {
     setDistance(0);
     setAvegageFuelConsumption(0);
     setPrice(0);
+    setQuantityPersons(1);
   };
 
   return (
@@ -129,21 +136,62 @@ function App() {
 
           <Grid item xs={12} sm={6}>
             <Box display="flex">
+              <TextField
+                id="price"
+                label="Кількість пасажирів"
+                variant="outlined"
+                size="small"
+                placeholder="0"
+                value={quantityPersons}
+                sx={{ minWidth: '150px', mr: 1 }}
+                onInput={(e) =>
+                  onInputHandler(
+                    'quantityPersons',
+                    e.target.value.replace(regexp, '')
+                  )
+                }
+              />
               <Typography
-                sx={{
-                  fontWeight: 500,
-                  mt: 'auto',
-                  fontSize: '18px',
-                  color: '#691a22',
-                }}
+                sx={{ fontWeight: 400, mt: 'auto', fontSize: '18px' }}
                 component="span"
               >
-                Вартість поїздки: {resutlt.toFixed(2)} грн.
+                пас.
               </Typography>
             </Box>
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <Button variant="outlined" sx={{ mt: 2 }} onClick={onClear}>
+
+          {result ? (
+            <Grid item xs={12} sm={6}>
+              <Box display="flex">
+                <Typography
+                  sx={{
+                    fontWeight: 500,
+                    mt: 'auto',
+                    fontSize: '18px',
+                    color: '#691a22',
+                  }}
+                  component="span"
+                >
+                  Вартість поїздки: {result.toFixed(2)} грн.
+                  <br />
+                  {quantityPersons > 1
+                    ? `Вартість для пасажира: ${pricePerPerson.toFixed(2)} грн.`
+                    : null}
+                </Typography>
+              </Box>
+            </Grid>
+          ) : null}
+
+          <Grid item xs={12} sm={12}>
+            <Button
+              variant="contained"
+              className="button"
+              sx={{
+                mt: 2,
+                width: '100%',
+              }}
+              onClick={onClear}
+            >
               Очистити
             </Button>
           </Grid>
