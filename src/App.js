@@ -1,50 +1,35 @@
-import { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  onClear,
+  onInputHandler,
+  totalPrice,
+  pricePerPassenger,
+} from './slices/AppSlice';
 
 function App() {
-  const [distance, setDistance] = useState(0);
-  const [averageFuelConsumption, setAvegageFuelConsumption] = useState(0);
-  const [price, setPrice] = useState(0);
-  const [result, setResult] = useState(0);
-  const [quantityPersons, setQuantityPersons] = useState(1);
-  const [pricePerPerson, setPricePerPerson] = useState(0);
+  const dispatch = useDispatch();
+  const {
+    result,
+    distance,
+    averageFuelConsumption,
+    price,
+    quantityPersons,
+    pricePerPerson,
+  } = useSelector((state) => state.app);
 
   const regexp = new RegExp('[^0-9.]');
 
   useEffect(() => {
-    setResult((averageFuelConsumption / 100) * distance * price);
-    setPricePerPerson(result / quantityPersons);
-  }, [distance, averageFuelConsumption, price, quantityPersons, result]);
-
-  const onInputHandler = (name, value = 0) => {
-    switch (name) {
-      case 'distance':
-        setDistance(value);
-        break;
-      case 'average':
-        setAvegageFuelConsumption(value);
-        break;
-      case 'price':
-        setPrice(value);
-        break;
-      case 'quantityPersons':
-        setQuantityPersons(value);
-        break;
-      default:
-    }
-  };
-
-  const onClear = () => {
-    setDistance(0);
-    setAvegageFuelConsumption(0);
-    setPrice(0);
-    setQuantityPersons(1);
-  };
+    dispatch(totalPrice());
+    dispatch(pricePerPassenger());
+  }, [distance, averageFuelConsumption, price, quantityPersons, dispatch]);
 
   return (
     <Paper
@@ -76,7 +61,12 @@ function App() {
                 value={distance}
                 sx={{ minWidth: '150px', mr: 1 }}
                 onInput={(e) =>
-                  onInputHandler('distance', e.target.value.replace(regexp, ''))
+                  dispatch(
+                    onInputHandler({
+                      name: 'distance',
+                      value: e.target.value.replace(regexp, ''),
+                    })
+                  )
                 }
               />
               <Typography
@@ -99,7 +89,12 @@ function App() {
                 value={averageFuelConsumption}
                 sx={{ minWidth: '150px', mr: 1 }}
                 onInput={(e) =>
-                  onInputHandler('average', e.target.value.replace(regexp, ''))
+                  dispatch(
+                    onInputHandler({
+                      name: 'average',
+                      value: e.target.value.replace(regexp, ''),
+                    })
+                  )
                 }
               />
               <Typography
@@ -122,14 +117,19 @@ function App() {
                 value={price}
                 sx={{ minWidth: '150px', mr: 1 }}
                 onInput={(e) =>
-                  onInputHandler('price', e.target.value.replace(regexp, ''))
+                  dispatch(
+                    onInputHandler({
+                      name: 'price',
+                      value: e.target.value.replace(regexp, ''),
+                    })
+                  )
                 }
               />
               <Typography
                 sx={{ fontWeight: 400, mt: 'auto', fontSize: '18px' }}
                 component="span"
               >
-                грн.
+                грн/л.
               </Typography>
             </Box>
           </Grid>
@@ -141,13 +141,15 @@ function App() {
                 label="Кількість пасажирів"
                 variant="outlined"
                 size="small"
-                placeholder="0"
+                placeholder="1"
                 value={quantityPersons}
                 sx={{ minWidth: '150px', mr: 1 }}
                 onInput={(e) =>
-                  onInputHandler(
-                    'quantityPersons',
-                    e.target.value.replace(regexp, '')
+                  dispatch(
+                    onInputHandler({
+                      name: 'quantityPersons',
+                      value: e.target.value.replace(regexp, ''),
+                    })
                   )
                 }
               />
@@ -190,7 +192,7 @@ function App() {
                 mt: 2,
                 width: '100%',
               }}
-              onClick={onClear}
+              onClick={() => dispatch(onClear())}
             >
               Очистити
             </Button>
